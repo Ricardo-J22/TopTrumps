@@ -33,7 +33,7 @@ public class Deck {
         Sheet sheet;
         Workbook book;
         try {
-            book = Workbook.getWorkbook(new File("C:\\Users\\jlr\\Desktop\\Coursework\\TopTrumps\\res\\data\\players.xls"));
+            book = Workbook.getWorkbook(new File("res\\data\\players.xls"));
 
             // 获得第一个工作表对象(ecxel中sheet的编号从0开始,0,1,2,3,....)
             sheet = book.getSheet(0);
