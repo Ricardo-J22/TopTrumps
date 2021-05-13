@@ -139,4 +139,22 @@ public class Card {
         return icon_id;
     }
 
+    @Override
+    public String toString() {
+        return "Card{" +
+                "name='" + name + '\'' +
+                ", nation='" + nation + '\'' +
+                ", club='" + club + '\'' +
+                ", height='" + height + '\'' +
+                ", weight='" + weight + '\'' +
+                ", foot='" + foot + '\'' +
+                ", age='" + age + '\'' +
+                ", attack=" + attack +
+                ", defence=" + defence +
+                ", skill=" + skill +
+                ", speed=" + speed +
+                ", power_cap=" + power_cap +
+                ", icon_id='" + icon_id + '\'' +
+                '}';
+    }
 }
