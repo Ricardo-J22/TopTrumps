@@ -52,7 +52,7 @@ public class Player {
      * 
      * @return is empty
      */
-    public boolean isLost() {
+    public boolean isTermined() {
         return cardLeft.isEmpty();
     }
 
@@ -61,17 +61,63 @@ public class Player {
      * 
      * @param stack
      */
-    public void addCardWon(List<Card> stack) {
-        for (Card card : stack) {
-            cardWon.add(card);
-        }
+    public void addCardWon(Card card) {
+        cardWon.add(card);
     }
 
     /**
-     * 
      * @return 已经赢得的卡数
      */
     public int getNumOfWon() {
         return cardWon.size();
     }
+    /**
+     * 查看最上面的一张卡
+     * 不移除
+     * @return card on the top
+     */
+    public Card getTop(){
+        return cardLeft.peek();
+    }
+    /**
+     * 查看并移除最上面的一张卡
+     * @return card on the top
+     */
+    public Card pop(){
+        return cardLeft.pop();
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + playerId;
+        return result;
+    }
+
+    
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Player other = (Player) obj;
+        if (playerId != other.playerId)
+            return false;
+        return true;
+    }
+
+    
 }

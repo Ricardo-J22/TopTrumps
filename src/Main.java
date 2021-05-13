@@ -3,9 +3,12 @@
  */
 public class Main {
     public static void main(String[] args) {
-        Deck a = new Deck(15);
-        a.initialCardStack();
-        a.shuffle();
-        System.out.println(a.getCardStack().get(0));
+       Game a = new Game(2);
+       a.startGame();
+       Player b = a.getCurrentPlayer();
+       while(b != null){
+            b = a.nextRound(b);
+           
+       }
     }
 }

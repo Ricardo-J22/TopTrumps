@@ -1,26 +1,34 @@
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.Random;
 import java.util.Collections;
 import java.util.List;
 import jxl.*;
 import java.io.File;
-
+/**
+ * 初始的牌组
+ */
 public class Deck {
-    private List<Card> CardStack; // 用到的牌堆（30张牌）
-    private final int deckSize; // 定义每个玩家初始的手牌数量
+    private List<Card> cardStack; // 用到的牌堆
+    private final int numOfCardUsed; // 定义用到牌的总数
 
     /**
      * @param deckSize
      */
     public Deck(int deckSize) {
-        CardStack = new ArrayList<>();
-        this.deckSize = deckSize;
+        cardStack = new ArrayList<>();
+        numOfCardUsed = deckSize;
+        initialcardStack();//初始化牌组
     }
 
     // 初始化牌堆
-    public void initialCardStack() {
-        CardStack = readExcel();
+    private void initialcardStack() {
+        cardStack = readExcel();// 使用jxl api 打乱牌组
+        if (numOfCardUsed != 30){
+            Random random = new Random();
+            for (int i = 0; i < 30 - numOfCardUsed; i++) { //根据传进来的参数决定随机移除多少个
+                cardStack.remove(random.nextInt(cardStack.size()));
+            }
+        }
     }
 
     /**
@@ -61,7 +69,7 @@ public class Deck {
     }
 
     /**
-     * 从excel读取数据并返回一个card对象
+     * 从excel读取一行数据并返回一个card对象
      * 
      * @param arrayCells
      * @return card
@@ -88,14 +96,14 @@ public class Deck {
      * 打乱牌堆顺序
      */
     public void shuffle(){
-        Collections.shuffle(CardStack);
+        Collections.shuffle(cardStack);
     }
 
     /**
      * 返回当前牌堆
      */
     public List<Card> getCardStack() {
-        return CardStack;
+        return cardStack;
     }
 
 }

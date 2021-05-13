@@ -1,3 +1,5 @@
+import java.util.Random;
+
 /**
  * Define properties of each card
  */
@@ -138,7 +140,53 @@ public class Card {
     public String getIcon_id() {
         return icon_id;
     }
+    /**
+     * 传入类别的字符串
+     * 返回选定的类别的数值
+     * 注意：字符串区分大小写
+     * @param category
+     * @return value
+     */
+    public int getCategoryValue(String category) {
+        if (category.equals("attack")){
+            return getAttack();
+        }
+        else if (category.equals("defence")){
+            return getDefence();
+        }
+        else if (category.equals("skill")){
+            return getSkill();
+        }
+        else if (category.equals("speed")){
+            return getSpeed();
+        }
+        else 
+            return getPower_cap();
+    }
 
+    /**
+     * 给电脑选择随机的数值
+     * @return category
+     */
+    public String getRandom(){
+        int number = new Random().nextInt(5);
+        if(number == 0){
+            return "attack";
+        }
+        if(number == 1){
+            return  "defence";
+        }
+        if(number == 2){
+            return "skill";
+        }
+        if(number == 3){
+            return  "speed";
+        }
+        else
+            return  "power_cap";
+        
+        
+    }
     @Override
     public String toString() {
         return "Card{" +
