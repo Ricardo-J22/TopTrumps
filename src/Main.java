@@ -1,14 +1,15 @@
+
 /**
- * 程序的入口通过 Main.java 打开窗口
+ * The entry of the game
  */
 public class Main {
     public static void main(String[] args) {
-       Game a = new Game(2);
-       a.startGame();
-       Player b = a.getCurrentPlayer();
-       while(b != null){
-            b = a.nextRound(b);
-           
-       }
+        // Create an object of GameCover class
+        GameCover g = new GameCover();
+        // Play the music
+        String filepath = "res/music/World cup theme song.wav";
+        Music musicObject = new Music();
+        musicObject.playMusic(filepath);
+
     }
 }

@@ -1,39 +1,84 @@
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.Collections;
 import java.util.List;
-import jxl.*;
-import java.io.File;
+import java.util.Random;
+
 /**
- * 初始的牌组
+ *
+ * Deck contain the card stack would use in a game.
+ * It includes the process of reading data from excel
+ * , creating cards instance and store in a List of card
+ * @author Lirui Jin
  */
 public class Deck {
-    private List<Card> cardStack; // 用到的牌堆
-    private final int numOfCardUsed; // 定义用到牌的总数
 
     /**
-     * @param deckSize
+     * List of cards instance used in a game
      */
-    public Deck(int deckSize) {
+    private List<Card> cardStack;
+
+    /**
+     * The total number of card would be used
+     */
+    private int numOfCardUsed;
+
+    /**
+     * Number of hand cards of every player
+     */
+    private int sizeOfHand;
+
+    /**
+     * Number of players in a game
+     */
+    private int numOfPlayer;
+
+    /**
+     * Initialize the game
+     *
+     * @param numOfPlayer
+     */
+    public Deck(int numOfPlayer) {
         cardStack = new ArrayList<>();
-        numOfCardUsed = deckSize;
-        initialcardStack();//初始化牌组
+        this.numOfPlayer = numOfPlayer;
+        initialCardStack();
     }
 
-    // 初始化牌堆
-    private void initialcardStack() {
-        cardStack = readExcel();// 使用jxl api 打乱牌组
-        if (numOfCardUsed != 30){
+    /**
+     * Initialize the card stack
+     * 1. Read data from excel using jxl api
+     * 2. Create card instance to store information from excel
+     * 3. Calculate the number of cards would be used
+     * 4. Random remove cards to adapt the standard
+     *
+     * @see <a href="http://jexcelapi.sourceforge.net/">
+     * http://jexcelapi.sourceforge.net/</a>
+     */
+    private void initialCardStack() {
+        cardStack = readExcel();
+        sizeOfHand = (cardStack.size() - (cardStack.size() % numOfPlayer)) / numOfPlayer;
+        numOfCardUsed = sizeOfHand * numOfPlayer;
+        if (numOfCardUsed != cardStack.size()) {
             Random random = new Random();
-            for (int i = 0; i < 30 - numOfCardUsed; i++) { //根据传进来的参数决定随机移除多少个
+            for (int i = 0; i < cardStack.size() - numOfCardUsed; i++) { // 根据传进来的参数决定随机移除多少个
                 cardStack.remove(random.nextInt(cardStack.size()));
             }
         }
     }
 
     /**
-     * 
-     * @return list of card 
+     * Using jxl api to read the information from excel
+     * 1.get workbook from excel
+     * 2.get the sheet
+     * 3.get cells in a line and get the content in String
+     * 4.using the information read from excel to create card instance
+     *
+     * @return list of card
+     * @see <a href="http://jexcelapi.sourceforge.net/">
+     *      * http://jexcelapi.sourceforge.net/</a>
      */
     private List<Card> readExcel() {
         List<Card> stack = new ArrayList<>();
@@ -61,49 +106,51 @@ public class Deck {
                 i++;
             }
             book.close();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
 
         }
         return stack;
     }
 
     /**
-     * 从excel读取一行数据并返回一个card对象
-     * 
+     * Read information from Cell array and create a Card instance
+     *
      * @param arrayCells
-     * @return card
+     * @return a instance of Card
      */
     private Card initCard(Cell[] arrayCells) {
-        String name = arrayCells[0].getContents();
-        String nation = arrayCells[1].getContents();
-        String club = arrayCells[2].getContents();
-        String height = arrayCells[3].getContents();
-        String weight = arrayCells[4].getContents();
-        String foot = arrayCells[5].getContents();
-        String age = arrayCells[6].getContents();
-        int attack = Integer.parseInt(arrayCells[7].getContents());
-        int defence = Integer.parseInt(arrayCells[8].getContents());
-        int skill = Integer.parseInt(arrayCells[9].getContents());
-        int speed = Integer.parseInt(arrayCells[10].getContents());
-        int power_cap = Integer.parseInt(arrayCells[11].getContents());
-        String icon_id = arrayCells[12].getContents();
-        return new Card(name, nation, club, height, weight, foot, age, attack, defence, skill, speed, power_cap,
-                icon_id);
+        String[] attribute = new String[13];
+        for (int i = 0; i < arrayCells.length; i++) {
+            attribute[i] = arrayCells[i].getContents();
+        }
+        return new Card(attribute);
     }
 
     /**
-     * 打乱牌堆顺序
+     * use Collection.shuffle() to shuffle the card stack
+     * @see java.util.Collections
      */
-    public void shuffle(){
+    public void shuffle() {
         Collections.shuffle(cardStack);
     }
 
+
     /**
-     * 返回当前牌堆
+     * get size of hand of every player
+     * @return numbers of hand
      */
-    public List<Card> getCardStack() {
-        return cardStack;
+    public int getSizeOfHand() {
+        return sizeOfHand;
     }
 
+    /**
+     * get the card on the top and remove it
+     *
+     * @return card
+     */
+    public Card getOneCard() {
+        Card top = cardStack.get(0);
+        cardStack.remove(0);
+        return top;
+    }
 }

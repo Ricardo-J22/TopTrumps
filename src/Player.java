@@ -1,20 +1,35 @@
-
-/**
- * @author Ricardo
- * 定义每个玩家的剩余牌堆和已经获得的数量
- * 对每个玩家的牌堆的操作
- */
-import java.util.Stack;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
+/**
+ *
+ * Define property of player,
+ * operation on card stack,
+ * record hand and cards won
+ * @author  Lirui Jin
+ */
 public class Player {
-    private int playerId;// 记录第几位玩家
-    private Stack<Card> cardLeft; // 剩余的牌堆
-    private List<Card> cardWon; // 赢得的排堆
 
     /**
-     * @param playerId
+     * player id
+     */
+    private final int playerId;
+
+    /**
+     * Use Stack to keep track of hands
+     */
+    private final Stack<Card> cardLeft;
+
+    /**
+     * Use a list to keep track of card won
+     */
+    private final List<Card> cardWon;
+
+    /**
+     * initial the player, set playerId and initial stack and list
+     *
+     * @param playerId id of player
      */
     public Player(int playerId) {
         this.playerId = playerId;
@@ -23,74 +38,76 @@ public class Player {
     }
 
     /**
-     * 返回玩家的编号
-     * 
-     * @return the playerId
+     * get id of player
+     * @return the id of player
      */
     public int getPlayerId() {
         return playerId;
     }
 
     /**
-     * 用于初始化牌堆！！！ 不用于赢得牌的加入
-     * 
-     * @param card
+     * put card into hand
+     *
+     * @param card card
      */
     public void addCardLeft(Card card) {
         cardLeft.push(card);
     }
 
     /**
-     * @return number of cardLeft
+     * get numbers of card left
+     * @return number of card left
      */
     public int getNumOfLeft() {
         return cardLeft.size();
     }
 
     /**
-     * 判断是否没有剩余卡了
-     * 
+     * check whether player has rest of hand
+     *
      * @return is empty
      */
-    public boolean isTermined() {
+    public boolean isTerminated() {
         return cardLeft.isEmpty();
     }
 
     /**
-     * 将赢得的卡放入List中
-     * 
-     * @param stack
+     * put card won into the stack of won
+     *
+     * @param card card to put in
      */
     public void addCardWon(Card card) {
         cardWon.add(card);
     }
 
     /**
-     * @return 已经赢得的卡数
+     * get numbers of card won
+     * @return number of card won
      */
     public int getNumOfWon() {
         return cardWon.size();
     }
+
     /**
-     * 查看最上面的一张卡
-     * 不移除
+     * look at the top of stack
+     *
      * @return card on the top
      */
-    public Card getTop(){
+    public Card getTop() {
+        if (cardLeft.isEmpty()) {
+            throw new RuntimeException(getPlayerId() + "没卡了");
+        }
         return cardLeft.peek();
     }
+
     /**
-     * 查看并移除最上面的一张卡
-     * @return card on the top
+     * remove the card on the top
      */
-    public Card pop(){
-        return cardLeft.pop();
+    public void pop() {
+        cardLeft.pop();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
-    
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -99,12 +116,7 @@ public class Player {
         return result;
     }
 
-    
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -114,10 +126,15 @@ public class Player {
         if (getClass() != obj.getClass())
             return false;
         Player other = (Player) obj;
-        if (playerId != other.playerId)
-            return false;
-        return true;
+        return playerId == other.playerId;
     }
 
-    
+    @Override
+    public String toString() {
+        return "Player{" +
+                "playerId=" + playerId +
+                ", cardLeft=" + cardLeft.size() +
+                ", cardWon=" + cardWon.size() +
+                '}';
+    }
 }

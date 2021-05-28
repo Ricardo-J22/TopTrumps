@@ -1,162 +1,178 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Scanner;
+
 /**
- * 游戏运行的主体
+ * The main body of the Game, including the whole information in a game
+ * such as number of player, state of the player, and category that chosen
+ * @author Lirui Jin
+ *
  */
 public class Game {
-    private int numOfPlayer;// 玩家的人数
-    private Player[] players;// 玩家数组
-    private Player currentPlayer;// 目前正在选择的人
-    private Deck mainDeck;// 总的牌组
-    private final int deckSize;// 每个人能拿到的牌
-    private List<Card> temp;// 临时列表
 
     /**
-     * @param numOfPlayer
-     * @param players
+     * number of player
+     */
+    private final int numOfPlayer;
+
+    /**
+     * array of Players in a game
+     */
+    private final Player[] players;
+
+    /**
+     * Player instance of current player
+     */
+    private Player currentPlayer;
+
+    /**
+     * The deck would be used in a game
+     */
+    private final Deck mainDeck;
+
+    /**
+     * The number of hand
+     */
+    private final int numOfPocketCard;
+
+    /**
+     * List of temp card list contain each of card of every player
+     */
+    private List<Card> temp;
+
+    /**
+     * index of chosen attribute
+     */
+    private int chosenCategory;
+
+    /**
+     * flag of draw of a round
+     */
+    private boolean isDraw;
+
+    /**
+     * constructor for game
+     *
+     * @param numOfPlayer number of player
      */
     public Game(int numOfPlayer) {
         this.numOfPlayer = numOfPlayer;
-        deckSize = (30 - (30 % numOfPlayer)) / numOfPlayer;// 避免单数产生的干扰
-        mainDeck = new Deck(deckSize * numOfPlayer);// 初始化牌组
+        isDraw = false;
+        chosenCategory = -1;
+        mainDeck = new Deck(numOfPlayer);// initial card stack
+        numOfPocketCard = mainDeck.getSizeOfHand();
         temp = new ArrayList<>();
-        players = new Player[numOfPlayer];// 初始化玩家数组
+        players = new Player[numOfPlayer];// initial number of player
         for (int i = 0; i < numOfPlayer; i++) {
             players[i] = new Player(i);
         }
     }
 
     /**
-     * 初始化游戏
+     * Initialize game
      */
     private void initGame() {
         mainDeck.shuffle();
         for (Player player : players) {
-            for (int i = 0; i < deckSize; i++) {// 为每一个玩家添加手牌
-                player.addCardLeft(mainDeck.getCardStack().get(0));
-                mainDeck.getCardStack().remove(0);
+            for (int i = 0; i < numOfPocketCard; i++) {// add card to every player
+                player.addCardLeft(mainDeck.getOneCard());
             }
         }
 
     }
 
     /**
-     * 开始游戏
+     * Start game
+     * Select random currentPlayer for start
      */
     public void startGame() {
         initGame();
-        currentPlayer = players[randomiseFirstPlayer()];// 随机选取位作为开始
-        nextRound(currentPlayer);
+        currentPlayer = players[randomiseFirstPlayer()];//
     }
 
     /**
-     * 随机选取开始的玩家
-     * 
+     * Random select random player
+     *
      * @return PlayerId
      */
     private int randomiseFirstPlayer() {
         return new Random().nextInt(numOfPlayer);
     }
 
-    /**
-     * 进行下一轮
-     * 分成需要人类玩家选择和电脑自动选择
-     * 所有的输出语句均为调试信息可注释！！！！
-     * @param currentPlayer
-     * @return currentPlayer 返回这轮的胜利者
-     */
-    public Player nextRound(Player currentPlayer) {
-        // 首先判断是否有玩家赢了超过50%的手牌，如果超过则立即停止游戏
-        for (Player player : players) {
-            if (player.getNumOfWon() > (deckSize * numOfPlayer / 2)) {
-                System.out.println("Game is over" + "player" + player.getPlayerId() + "is the winner");
-                return null;
-            }
-        }
-        /*
-         * 这里仅考虑了一名人类玩家，当人类玩家开始时，读取选择的category
-         * 这里暂时使用了屏幕输入，需要GUI界面读入相应的参数！！！！！！！
-         */
-        if (currentPlayer.equals(players[0])) {
-            System.out.println("You choose to");
-            Scanner input = new Scanner(System.in);
-            String b = input.next();
-            System.out.println("You choose " + b + " " + currentPlayer.getTop().getCategoryValue(b));
-            // System.out.println(currentPlayer.getTop().toString());
-            System.out.println("Player 1 is " + players[1].getTop().getCategoryValue(b));
-            // System.out.println("\n"+players[1].getTop().toString());
-            return checkRoundResult(b);
-        } else {
-            /**
-             * 当电脑为选择人的时候，电脑会调用Card下面的getRandom()去选择随机的category
-             * 此时人类玩家并不需要点击操作仅需知道结构
-             */
-            String a = currentPlayer.getTop().getRandom();
-            System.out.println("Player " + currentPlayer.getPlayerId() + " choose " + a + " "
-                    + currentPlayer.getTop().getCategoryValue(a));
-            // System.out.println(currentPlayer.getTop().toString());
-            System.out.println("Your is " + players[0].getTop().getCategoryValue(a));
-            // System.out.println("\n"+players[0].getTop().toString());
-            return checkRoundResult(a);
-        }
 
-    }
     /**
-     * 将选择的cateogry传入函数
-     * 将每名还有剩余手牌的玩家的最上方的卡加入List(Nondestructive method)
-     * 比较数值大的那个人设定为winner, 然后将每位玩家的手牌中最上方的卡pop出去(Destructive method)
-     * Winner获得Temp List中的所有卡片加入 CardWon List
-     * 清空 temp 中的所有内容
-     * 如果遇到平局，保留temp内容，递归调用nextRound(),并保留当前正在操作的人
-     * @param chosenCategory
-     * @return winner 返回此轮的获胜者
+     * Begin next round according to next round
      */
-    private Player checkRoundResult(String chosenCategory) {
-        int highestVal = currentPlayer.getTop().getCategoryValue(chosenCategory);
+    public void nextRound() {
+        checkRoundResult();
+    }
+
+    /**
+     * Set computer choice if current player is computer
+     */
+    public void setComputerChoice() {
+        if (!currentPlayer.equals(players[0])) {
+            int category = currentPlayer.getTop().getRandom();
+            setChosenCategory(category);
+        }
+    }
+
+
+    /**
+     * Helper method for nextRound(),
+     * add every player's top of card into temp list(Nondestructive way).
+     * Compare the value of chosen category and get the winner.
+     * Then remove cards of everyone's top(Destructive method) and put cards in temp list to the winner player's
+     * card won list. Next, clear the temp list and set winner as player playing next round, set isDraw flag to false.
+     * If draw，remain temp list and currentPlayer, set isDraw flag to true
+     */
+    private void checkRoundResult() {
+        int highestVal = Integer.parseInt(currentPlayer.getTop().getCategoryValue(chosenCategory));
         Player winner = currentPlayer;
         int drawValue = 0;
-        addCardToTemp();//将每名玩家最上方的卡加入temp
+        addCardToTemp();// add cards on the top to temp list
         for (Player player : players) {
-            if (!player.isTermined()) { // 判断是否还有手牌
-                if (!player.equals(currentPlayer)) { //比较时排除自己本身
-                    if (player.getTop().getCategoryValue(chosenCategory) > highestVal) {
-                        highestVal = player.getTop().getCategoryValue(chosenCategory);
+            if (!player.isTerminated()) { // check remains hand
+                if (!player.equals(currentPlayer)) {
+                    if (Integer.parseInt(player.getTop().getCategoryValue(chosenCategory)) > highestVal) {
+                        highestVal = Integer.parseInt(player.getTop().getCategoryValue(chosenCategory));
                         winner = player;
-                    } else if (player.getTop().getCategoryValue(chosenCategory) == highestVal) {
-                        drawValue = highestVal; //如果遇到相同最高数，赋值给drawValue
+                    } else if (Integer.parseInt(player.getTop().getCategoryValue(chosenCategory)) == highestVal) {
+                        drawValue = highestVal;
                     }
                 }
 
             }
         }
-        //移除所有人的第一张
+        // remove every card on the top of hand
         for (Player player : players) {
-            if (!player.isTermined()) {
+            if (!player.isTerminated()) {
                 player.pop();
             }
         }
-        //平均递归调用
+        // if is a draw set flag
         if (highestVal == drawValue) {
-            System.out.println("It is draw");
-            return nextRound(currentPlayer);
+            System.out.println("It is a draw");
+            isDraw = true;
+            return;
         }
-        //将temp中的牌给赢家
+        // move card in temp to the winner
         for (Card card : temp) {
             winner.addCardWon(card);
         }
-        temp = new ArrayList<>();//清空temp
-        currentPlayer = winner;//下一次操作人为winner
-        System.out.println("player " + currentPlayer.getPlayerId() + " win");
-        return winner;//返回winner
+        temp = new ArrayList<>();// clear temp
+        currentPlayer = winner;// set next player be the winner
+        System.out.println("player " + currentPlayer.getPlayerId() + " win this round");
+        isDraw = false;
+
     }
+
     /**
-     * 将每名还有剩余手牌的玩家的最上方的卡加入List(Nondestructive method)
+     * Add the top card of each player who still has a hand left(Nondestructive method)
      */
     private void addCardToTemp() {
         for (Player player : players) {
-            if (!player.isTermined()) {
+            if (!player.isTerminated()) {
                 temp.add(player.getTop());
             }
 
@@ -164,22 +180,41 @@ public class Game {
     }
 
     /**
-     * 写了没什么用
-     * 测试的时候用用吧
-     * @return
+     * check whether is terminated
+     * @return player has card left
      */
-    public boolean isOver() {
-        for (Player player : players) {
-            if (player.getNumOfWon() > (deckSize / 2)) {
-                System.out.println("Game is over" + "player " + player.getPlayerId() + " is the winner");
-                return true;
-            }
-        }
-        return false;
+    private boolean isTerminated() {
+        return players[0].isTerminated();
     }
 
     /**
-     * 测试用，也有可能用
+     * Return a final winner, if does not has, return null
+     *
+     * @return the final winner
+     */
+    public Player getFinalWinner() {
+        if (isTerminated()) {
+            Player winner = players[0];
+            int numOfCard = players[0].getNumOfWon();
+            for (Player player : players) {
+                if (player.getNumOfWon() > numOfCard) {
+                    winner = player;
+                    numOfCard = player.getNumOfWon();
+                }
+            }
+            return winner;
+        }
+        for (Player player : players) {
+            if (player.getNumOfWon() > (numOfPocketCard * numOfPlayer / 2)) {
+                return player;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * get the player play for next round
      * @return the currentPlayer
      */
     public Player getCurrentPlayer() {
@@ -187,11 +222,50 @@ public class Game {
     }
 
     /**
-     * 测试用
-     * @return the players
+     * get array of players
+     * @return array of players
      */
     public Player[] getPlayers() {
         return players;
     }
 
+    /**
+     * Check if have two or more winners
+     * @return Whether the game has two or more winners
+     */
+    public boolean hasTwoWinner() {
+        Player winner = getFinalWinner();
+        if (winner != null) {
+            for (Player player : players) {
+                if ((!player.equals(winner)) && (player.getNumOfWon() == winner.getNumOfWon())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * return the index of chosenCategory
+     * @return index of chosenCategory
+     */
+    public int getChosenCategory() {
+        return chosenCategory;
+    }
+
+    /**
+     * set category through the index
+     * @param chosenCategory the chosenCategory to set
+     */
+    public void setChosenCategory(int chosenCategory) {
+        this.chosenCategory = chosenCategory;
+    }
+
+    /**
+     * return if this round is a draw
+     * @return If this round is a draw
+     */
+    public boolean isDraw() {
+        return isDraw;
+    }
 }

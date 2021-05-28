@@ -1,208 +1,86 @@
+import java.util.Arrays;
 import java.util.Random;
 
 /**
- * Define properties of each card
+ *
+ * Define the properties of card.
+ * @author Lirui Jin
  */
 public class Card {
-    private String name;
-    private String nation;
-    private String club;
-    private String height;
-    private String weight;
-    private String foot;
-    private String age;
-    private int attack;
-    private int defence;
-    private int skill;
-    private int speed;
-    private int power_cap;
-    private String icon_id;
 
     /**
-     * @param name
-     * @param nation
-     * @param club
-     * @param height
-     * @param weight
-     * @param foot
-     * @param age
-     * @param attack
-     * @param defence
-     * @param skill
-     * @param speed
-     * @param power_cap
-     * @param icon_id
+     * String Array contain all data of the card/ football player.
+     * index: 0 - 7: basic information
+     * 0. name 1. nation 2.club 3.height 4. weight 5. foot 6. age 7. icon_path
+     * index: 8 - 12: 4 categories of abilities for comparison
+     * 8. attack 9. defence 10. skill 11. speed 12.power_capabilities
      */
-    public Card(String name, String nation, String club, String height, String weight, String foot, String age,
-            int attack, int defence, int skill, int speed, int power_cap, String icon_id) {
-        this.name = name;
-        this.nation = nation;
-        this.club = club;
-        this.height = height;
-        this.weight = weight;
-        this.foot = foot;
-        this.age = age;
-        this.attack = attack;
-        this.defence = defence;
-        this.skill = skill;
-        this.speed = speed;
-        this.power_cap = power_cap;
-        this.icon_id = icon_id;
+    private final String[] attribute;
+    public static final int ICON_PATH = 7;
+    public static final int ATTACK = 8;
+    public static final int DEFENCE = 9;
+    public static final int SKILL = 10;
+    public static final int SPEED = 11;
+    public static final int POWER_CAP = 12;
+
+    /**
+     * @param attribute String array contains all data of a card
+     */
+    public Card(String[] attribute) {
+        this.attribute = attribute;
     }
 
     /**
-     * @return the name
+     * get category value
+     * @param index index of chosen category
+     * @return value of chosen category in String
      */
-    public String getName() {
-        return name;
+    public String getCategoryValue(int index) {
+        switch (index) {
+            case ATTACK:
+                return attribute[ATTACK];
+            case DEFENCE:
+                return attribute[DEFENCE];
+            case SKILL:
+                return attribute[SKILL];
+            case SPEED:
+                return attribute[SPEED];
+            case POWER_CAP:
+                return attribute[POWER_CAP];
+            default:
+                return null;
+
+        }
+
     }
 
     /**
-     * @return the nation
+     * generate random index for category
+     * @return random index of attributes
      */
-    public String getNation() {
-        return nation;
+    public int getRandom() {
+        return new Random().nextInt(5) + 8;
+
     }
 
     /**
-     * @return the club
-     */
-    public String getClub() {
-        return club;
-    }
-
-    /**
-     * @return the height
-     */
-    public String getHeight() {
-        return height;
-    }
-
-    /**
-     * @return the weight
-     */
-    public String getWeight() {
-        return weight;
-    }
-
-    /**
-     * @return the foot
-     */
-    public String getFoot() {
-        return foot;
-    }
-
-    /**
-     * @return the age
-     */
-    public String getAge() {
-        return age;
-    }
-
-    /**
-     * @return the attack
-     */
-    public int getAttack() {
-        return attack;
-    }
-
-    /**
-     * @return the defence
-     */
-    public int getDefence() {
-        return defence;
-    }
-
-    /**
-     * @return the skill
-     */
-    public int getSkill() {
-        return skill;
-    }
-
-    /**
-     * @return the speed
-     */
-    public int getSpeed() {
-        return speed;
-    }
-
-    /**
-     * @return the power_cap
-     */
-    public int getPower_cap() {
-        return power_cap;
-    }
-
-    /**
-     * @return the icon_id
+     * return the icon path
+     * @return ICON_PATH in String
      */
     public String getIcon_id() {
-        return icon_id;
-    }
-    /**
-     * 传入类别的字符串
-     * 返回选定的类别的数值
-     * 注意：字符串区分大小写
-     * @param category
-     * @return value
-     */
-    public int getCategoryValue(String category) {
-        if (category.equals("attack")){
-            return getAttack();
-        }
-        else if (category.equals("defence")){
-            return getDefence();
-        }
-        else if (category.equals("skill")){
-            return getSkill();
-        }
-        else if (category.equals("speed")){
-            return getSpeed();
-        }
-        else 
-            return getPower_cap();
+        return attribute[ICON_PATH];
     }
 
     /**
-     * 给电脑选择随机的数值
-     * @return category
+     * get attribute array
+     * @return attribute array
      */
-    public String getRandom(){
-        int number = new Random().nextInt(5);
-        if(number == 0){
-            return "attack";
-        }
-        if(number == 1){
-            return  "defence";
-        }
-        if(number == 2){
-            return "skill";
-        }
-        if(number == 3){
-            return  "speed";
-        }
-        else
-            return  "power_cap";
-        
-        
+    public String[] getAttribute() {
+        return attribute;
     }
+
     @Override
     public String toString() {
-        return "Card{" +
-                "name='" + name + '\'' +
-                ", nation='" + nation + '\'' +
-                ", club='" + club + '\'' +
-                ", height='" + height + '\'' +
-                ", weight='" + weight + '\'' +
-                ", foot='" + foot + '\'' +
-                ", age='" + age + '\'' +
-                ", attack=" + attack +
-                ", defence=" + defence +
-                ", skill=" + skill +
-                ", speed=" + speed +
-                ", power_cap=" + power_cap +
-                ", icon_id='" + icon_id + '\'' +
-                '}';
+        return "Card{" + "attribute=" + Arrays.toString(attribute) + '}';
     }
 }
